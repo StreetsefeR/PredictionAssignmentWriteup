@@ -2,58 +2,72 @@
 
 ##Data 
 
-###The training data for this project are available here: 
-###https://d396qusza40orc.cloudfront.net/predmachlearn/pml-training.csv
+####The training data for this project are available here: 
+####https://d396qusza40orc.cloudfront.net/predmachlearn/pml-training.csv
 
-###The test data are available here: 
-###https://d396qusza40orc.cloudfront.net/predmachlearn/pml-testing.csv
+####The test data are available here: 
+####https://d396qusza40orc.cloudfront.net/predmachlearn/pml-testing.csv
 
-###The data for this project come from this source: http://groupware.les.inf.puc-rio.br/har.
+####The data for this project come from this source: http://groupware.les.inf.puc-rio.br/har.
 
 ##Preliminary analysis and data cleaning
 
-###According to assignment objective it is intended to try different techniques(Decision Tree and Random Forest) to find best and decently descriptive predictive algoritm
+####According to assignment objective it is intended to try different techniques(Decision Tree and Random Forest) to find best and decently descriptive predictive algoritm
 
-###Therefore following libraries will be used:
+####Therefore following libraries will be used:
+```
 library(caret)
 library(rpart)
 library(randomForest)
+```
 
-###Data loaded for analysis with following code:
+####Data loaded for analysis with following code:
+```
+trainUrl <- "https://d396qusza40orc.cloudfront.net/predmachlearn/pml-training.csv"
+testUrl <- "http://d396qusza40orc.cloudfront.net/predmachlearn/pml-testing.csv"
+training <- read.csv(url(trainUrl), na.strings=c("NA","#DIV/0!",""))
+testing <- read.csv(url(testUrl), na.strings=c("NA","#DIV/0!",""))
+```
 
-###trainUrl <- "https://d396qusza40orc.cloudfront.net/predmachlearn/pml-training.csv"
-###testUrl <- "http://d396qusza40orc.cloudfront.net/predmachlearn/pml-testing.csv"
-###training <- read.csv(url(trainUrl), na.strings=c("NA","#DIV/0!",""))
-###testing <- read.csv(url(testUrl), na.strings=c("NA","#DIV/0!",""))
+####Note: at the stage of loading data is converted according to most common used NA strings
 
-###Note: at the stage of loading data is converted according to most common used NA strings
+####First look at data indicates necesity for pre-processing to be able to use learning algoritms. Commands to view structure of loaded data:
+```
+summary(training)
+str(training)
+```
 
-###First look at data indicates necesity for pre-processing to be able to use learning algoritms. Commands to view structure of loaded data:
-###summary(training)
-###str(training)
+####Measurement features(columns) starting with "roll_belt"(8-th) are in different formats. To prepare data for analysis all columns are converted to numeric type:
+```
+for(i in c(8:ncol(training)-1)) {
+	training[,i] = as.numeric(as.character(training [,i]))
+}
+```
 
-###Measurement features(columns) starting with "roll_belt"(8-th) are in different formats. To prepare data for analysis all columns are converted to numeric type:
-###for(i in c(8:ncol(training)-1)) {
-###	training[,i] = as.numeric(as.character(training [,i]))
-###}
+####First 7 features(columns) shold be deleted from training set as the names, timestamps and window info are not providing learning insight and may mislead to wrong relations:
+```
+tidyTraining <- training[colnames(training[colSums(is.na(training)) == 0])[-(1:7)]]
+```
+####To provide reproducibility seed is set:
+```
+set.seed(12321)
+```
 
-###First 7 features(columns) shold be deleted from training set as the names, timestamps and window info are not providing learning insight and may mislead to wrong relations:
-###tidyTraining <- training[colnames(training[colSums(is.na(training)) == 0])[-(1:7)]]
-
-###To provide reproducibility seed is set:
-###set.seed(12321)
-
-###Dividing training set into training and testing subset in 60/40 proportion
-###inTrain <- createDataPartition(y=tidyTraining$classe, p=0.6, list=FALSE )
-###training.training <- tidyTraining [inTrain ,]
-###training.testing <- tidyTraining [-inTrain ,]
+####Dividing training set into training and testing subset in 60/40 proportion
+```
+inTrain <- createDataPartition(y=tidyTraining$classe, p=0.6, list=FALSE )
+training.training <- tidyTraining [inTrain ,]
+training.testing <- tidyTraining [-inTrain ,]
+```
 
 ##Algorithms application and comparison
 
 ###Decision Tree:
-###modelTree <- rpart(classe ~ ., data=training.training, method="class")
-###predictionTree <- predict(modelTree , training.testing, type = "class")
-###confusionMatrix(predictionTree, training.testing$classe)
+```
+modelTree <- rpart(classe ~ ., data=training.training, method="class")
+predictionTree <- predict(modelTree , training.testing, type = "class")
+confusionMatrix(predictionTree, training.testing$classe)
+```
 
 ```
 ###Confusion Matrix and Statistics
@@ -90,11 +104,14 @@ library(randomForest)
 ```
 
 ###Random Forests:
-###modelForest <- randomForest(classe ~. , data=training.training)
-###predictionForest <- predict(modelForest , training.testing, type = "class")
-###confusionMatrix(predictionForest, training.testing$classe)
+```
+modelForest <- randomForest(classe ~. , data=training.training)
+predictionForest <- predict(modelForest , training.testing, type = "class")
+confusionMatrix(predictionForest, training.testing$classe)
+```
 
-```###Confusion Matrix and Statistics
+```
+##Confusion Matrix and Statistics
 
 ###          Reference
 ###Prediction    A    B    C    D    E
@@ -132,17 +149,21 @@ library(randomForest)
 ##Prediction and report files generation
 
 ###Applying random forest to initial testing data:
-
-###predictionFinal <- predict(modelForest , testing, type = "class")
+```
+predictionFinal <- predict(modelForest , testing, type = "class")
+```
 
 ###Generation function:
 
-###pml_write_files = function(x){
-###  n = length(x)
-###  for(i in 1:n){
-###    filename = paste0("problem_id_",i,".txt")
-###    write.table(x[i],file=filename,quote=FALSE,row.names=FALSE,col.names=FALSE)
-###  }
-###}
-
+```
+pml_write_files = function(x){
+n = length(x)
+for(i in 1:n){
+filename = paste0("problem_id_",i,".txt")
+write.table(x[i],file=filename,quote=FALSE,row.names=FALSE,col.names=FALSE)
+  }
+}
+```
+```
 ###pml_write_files(predictionFinal)
+```
