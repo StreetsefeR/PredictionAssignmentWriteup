@@ -165,5 +165,5 @@ write.table(x[i],file=filename,quote=FALSE,row.names=FALSE,col.names=FALSE)
 }
 ```
 ```
-###pml_write_files(predictionFinal)
+pml_write_files(predictionFinal)
 ```
