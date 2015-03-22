@@ -55,6 +55,7 @@ library(randomForest)
 ###predictionTree <- predict(modelTree , training.testing, type = "class")
 ###confusionMatrix(predictionTree, training.testing$classe)
 
+```
 ###Confusion Matrix and Statistics
 
 ###          Reference
@@ -86,13 +87,14 @@ library(randomForest)
 ###Detection Rate         0.2520   0.1234   0.1323   0.1036   0.1313
 ###Detection Prevalence   0.2973   0.1974   0.2029   0.1512   0.1512
 ###Balanced Accuracy      0.9112   0.7729   0.8366   0.7877   0.8450
+```
 
 ###Random Forests:
 ###modelForest <- randomForest(classe ~. , data=training.training)
 ###predictionForest <- predict(modelForest , training.testing, type = "class")
 ###confusionMatrix(predictionForest, training.testing$classe)
 
-###Confusion Matrix and Statistics
+```###Confusion Matrix and Statistics
 
 ###          Reference
 ###Prediction    A    B    C    D    E
@@ -123,6 +125,7 @@ library(randomForest)
 ###Detection Rate         0.2843   0.1923   0.1727   0.1612   0.1832
 ###Detection Prevalence   0.2851   0.1939   0.1759   0.1619   0.1833
 ###Balanced Accuracy      0.9992   0.9961   0.9933   0.9915   0.9982
+```
 
 ###As supposed random forests provided higher and definitely good accuracy of 0.9938 in comparison with decision tree value of 0.7425
 
